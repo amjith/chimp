@@ -2,13 +2,6 @@
 
 #include <inttypes.h>
 
-#include "chimp/gc.h"
-#include "chimp/any.h"
-#include "chimp/ast.h"
-#include "chimp/str.h"
-#include "chimp/int.h"
-#include "chimp/array.h"
-#include "chimp/hash.h"
 #include "chimp/object.h"
 #include "chimp/_parser_ext.h"
 
