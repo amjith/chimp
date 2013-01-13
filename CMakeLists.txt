@@ -9,13 +9,6 @@ find_package (BISON REQUIRED)
 find_package (FLEX REQUIRED)
 find_package (Threads REQUIRED)
 
-find_path(LIBRT_INCLUDE_DIR
-    NAMES time.h
-    PATHS
-        ${LIBRTDIR}/include
-        /usr/local/include
-        /usr/include)
-
 set (LIB_SEARCH_PATH
         ${LIBRTDIR}/lib
         /usr/local/lib64
@@ -29,6 +22,9 @@ find_file(LIBRT_LIBRARIES librt.a PATHS ${LIB_SEARCH_PATH})
 
 if (NOT LIBRT_LIBRARIES)
     find_library (LIBRT_LIBRARIES rt PATHS ${LIB_SEARCH_PATH})
+    if (NOT LIBRT_LIBRARIES)
+        set (LIBRT_LIBRARIES "")
+    endif()
 endif()
 
 message (STATUS "librt: ${LIBRT_LIBRARIES}")
@@ -172,7 +168,6 @@ set_target_properties (libchimp PROPERTIES OUTPUT_NAME chimp)
 set_target_properties (libchimp PROPERTIES
     COMPILE_FLAGS "-I${PROJECT_SOURCE_DIR}/libchimp/modules/_uv/libuv/include")
 
-#set_target_properties (libchimp PROPERTIES COMPILE_FLAGS "-I${LIBRT_INCLUDE_DIR}")
 add_dependencies (libchimp uv)
 
 set (CHIMP_LIBRARIES
