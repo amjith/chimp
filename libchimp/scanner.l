@@ -6,6 +6,7 @@
 #include "chimp/_parser_ext.h"
 #include "chimp/_parser.h"
 #include "chimp/int.h"
+#include "chimp/float.h"
 
 #define CHIMP_REF_TOKEN(token, r) yylval->ref = (r); return (token);
 #define CHIMP_TOKEN(token) return (token);

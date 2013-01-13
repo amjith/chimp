@@ -24,7 +24,7 @@ main argv {
   var y = ["foo"];
   var z = x;
 
-  io.print(hash(), z, y, str(z), {"foo": "bar", "bar": "baz"}, true, 9223372036854775807);
+  io.print(hash(), z, y, str(z), {"foo": "bar", "bar": "baz"}, true, 9223372036854775807, 3.14);
 
   var some_func = fn { |x| io.print(str("a function! ", x)); };
   some_func("testing");

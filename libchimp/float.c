@@ -16,6 +16,15 @@
  *                                                                           *
  *****************************************************************************/
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <inttypes.h>
+
+#include "chimp/float.h"
+#include "chimp/str.h"
+#include "chimp/class.h"
+#include "chimp/ast.h"
+
 ChimpRef *chimp_float_class = NULL;
 
 static ChimpRef *
@@ -24,6 +33,27 @@ _chimp_float_init (ChimpRef *self, ChimpRef *args)
     /* TODO convert str arg to int */
     return self;
 }
+
+static ChimpRef *
+chimp_float_str (ChimpRef *self)
+{
+    char buf[64];
+    int len;
+
+    len = snprintf (buf, sizeof(buf), "%f" , CHIMP_FLOAT(self)->value);
+
+    if (len < 0) {
+        return NULL;
+    }
+    else if (len > sizeof(buf)) {
+        CHIMP_BUG ("chimp_float_str output truncated: %" PRId64,
+                    CHIMP_FLOAT(self)->value);
+        return NULL;
+    }
+
+    return chimp_str_new (buf, len);
+}
+
 
 chimp_bool_t
 chimp_float_class_bootstrap (void)
@@ -35,6 +65,7 @@ chimp_float_class_bootstrap (void)
     }
     chimp_gc_make_root (NULL, chimp_float_class);
     CHIMP_CLASS(chimp_float_class)->init = _chimp_float_init;
+    CHIMP_CLASS(chimp_float_class)->str = chimp_float_str;
     return CHIMP_TRUE;
 }
 

@@ -584,6 +584,8 @@ chimp_symtable_visit_expr (ChimpRef *self, ChimpRef *expr)
             return chimp_symtable_visit_expr_binop (self, expr);
         case CHIMP_AST_EXPR_INT_:
             return CHIMP_TRUE;
+        case CHIMP_AST_EXPR_FLOAT_:
+            return CHIMP_TRUE;
         case CHIMP_AST_EXPR_FN:
             return chimp_symtable_visit_expr_fn (self, expr);
         case CHIMP_AST_EXPR_SPAWN:

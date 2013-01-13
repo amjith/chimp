@@ -23,6 +23,7 @@
 #include "chimp/class.h"
 #include "chimp/str.h"
 #include "chimp/int.h"
+#include "chimp/float.h"
 #include "chimp/array.h"
 #include "chimp/method.h"
 #include "chimp/task.h"
@@ -313,6 +314,7 @@ chimp_core_init_builtins (void)
     chimp_hash_put_str (chimp_builtins, "hash",   chimp_hash_class);
     chimp_hash_put_str (chimp_builtins, "array",  chimp_array_class);
     chimp_hash_put_str (chimp_builtins, "int",    chimp_int_class);
+    chimp_hash_put_str (chimp_builtins, "float",  chimp_float_class);
     chimp_hash_put_str (chimp_builtins, "str",    chimp_str_class);
     chimp_hash_put_str (chimp_builtins, "bool",   chimp_bool_class);
     chimp_hash_put_str (chimp_builtins, "module", chimp_module_class);
@@ -364,6 +366,7 @@ chimp_core_startup (const char *path, void *stack_start)
     }
 
     if (!chimp_int_class_bootstrap ()) goto error;
+    if (!chimp_float_class_bootstrap ()) goto error;
     if (!chimp_array_class_bootstrap ()) goto error;
     if (!chimp_hash_class_bootstrap ()) goto error;
     if (!chimp_test_class_bootstrap()) goto error;

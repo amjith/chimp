@@ -19,6 +19,7 @@
 #ifndef _CHIMP_FLOAT_H_INCLUDED_
 #define _CHIMP_FLOAT_H_INCLUDED_
 
+#include <chimp/gc.h>
 #include <chimp/any.h>
 
 #ifdef __cplusplus
