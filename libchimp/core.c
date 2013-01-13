@@ -421,6 +421,9 @@ chimp_core_startup (const char *path, void *stack_start)
     if (!chimp_module_add_builtin (chimp_init_net_module ()))
         goto error;
 
+    if (!chimp_module_add_builtin (chimp_init_uv_module ()))
+        goto error;
+
     if (!chimp_core_init_builtins ()) goto error;
 
     chimp_module_path = _chimp_module_make_path (path);

@@ -130,10 +130,12 @@ _chimp_symtable_entry_init (ChimpRef *self, ChimpRef *args)
     CHIMP_SYMTABLE_ENTRY(self)->parent = parent;
     CHIMP_SYMTABLE_ENTRY(self)->symbols = chimp_hash_new ();
     if (CHIMP_SYMTABLE_ENTRY(self)->symbols == NULL) {
+        CHIMP_BUG ("failed to allocate symbols hash");
         return NULL;
     }
     CHIMP_SYMTABLE_ENTRY(self)->children = chimp_array_new ();
     if (CHIMP_SYMTABLE_ENTRY(self)->children == NULL) {
+        CHIMP_BUG ("failed to allocate children hash");
         return NULL;
     }
     return self;
@@ -151,6 +153,11 @@ _chimp_symtable_entry_mark (ChimpGC *gc, ChimpRef *self)
     chimp_gc_mark_ref (gc, CHIMP_SYMTABLE_ENTRY(self)->children);
 }
 
+static void
+_chimp_symtable_entry_dtor (ChimpRef *dtor)
+{
+}
+
 chimp_bool_t
 chimp_symtable_entry_class_bootstrap (void)
 {
@@ -161,6 +168,7 @@ chimp_symtable_entry_class_bootstrap (void)
     }
     CHIMP_CLASS(chimp_symtable_entry_class)->init = _chimp_symtable_entry_init;
     CHIMP_CLASS(chimp_symtable_entry_class)->mark = _chimp_symtable_entry_mark;
+    CHIMP_CLASS(chimp_symtable_entry_class)->dtor = _chimp_symtable_entry_dtor;
     chimp_gc_make_root (NULL, chimp_symtable_entry_class);
     return CHIMP_TRUE;
 }

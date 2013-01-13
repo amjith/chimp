@@ -387,54 +387,62 @@ chimp_gc_sweep (ChimpGC *gc)
     __asm__("movq %%rsp, %0" : "=r" (ptr))
 #elif (defined CHIMP_ARCH_X86_32) && (defined __GNUC__)
 #define CHIMP_GC_GET_STACK_END(ptr, guess) \
-    __asm__("movq %%esp, %0" : "=r" (end))
+    __asm__("movq %%esp, %0" : "=r" (ptr))
 #else
 #warning "Unknown or unsupported architecture: GC must guess at stack end"
-#define CHIMP_GC_GET_STACK_END(ptr, guess) (end) = (guess)
+#define CHIMP_GC_GET_STACK_END(ptr, guess) (ptr) = (guess)
 #endif
 
 chimp_bool_t
 chimp_gc_collect (ChimpGC *gc)
 {
-    /* regs **MUST** be first variable declared in this function */
-    void *regs[16];
-    void *regs_ptr;
     size_t i;
     ChimpRef *ref;
     ChimpRef *base;
     /* save registers to the stack */
 #if (defined CHIMP_ARCH_X86_64) && (defined __GNUC__)
-    __asm__("movq %rax, -8(%rbp)");
-    __asm__("movq %rbx, -16(%rbp)");
-    __asm__("movq %rcx, -24(%rbp)");
-    __asm__("movq %rdx, -32(%rbp)");
-    __asm__("movq %rsi, -40(%rbp)");
-    __asm__("movq %rdi, -48(%rbp)");
-    __asm__("movq %r8, -56(%rbp)");
-    __asm__("movq %r9, -64(%rbp)");
-    __asm__("movq %r10, -72(%rbp)");
-    __asm__("movq %r11, -80(%rbp)");
-    __asm__("movq %r12, -88(%rbp)");
-    __asm__("movq %r13, -96(%rbp)");
-    __asm__("movq %r14, -104(%rbp)");
-    __asm__("movq %r15, -112(%rbp)");
-    __asm__("movq %rbp, -120(%rbp)");
-    __asm__("movq %rsp, -128(%rbp)");
+    void *regs[16];
+    __asm__ volatile ("push %rax;");
+    __asm__ volatile (
+         "movq %%rbx, 8(%%rax);"
+         "movq %%rcx, 16(%%rax);"
+         "movq %%rdx, 24(%%rax);"
+         "movq %%rsi, 32(%%rax);"
+         "movq %%rdi, 40(%%rax);"
+         "movq %%r8,  48(%%rax);"
+         "movq %%r9,  56(%%rax);"
+         "movq %%r10, 64(%%rax);"
+         "movq %%r11, 72(%%rax);"
+         "movq %%r12, 80(%%rax);"
+         "movq %%r13, 88(%%rax);"
+         "movq %%r14, 96(%%rax);"
+         "movq %%r15, 104(%%rax);"
+         "pop %%rbx;"
+         "movq %%rbx, 112(%%rax);"
+         :
+         : "a" (regs)
+         : "%rbx", "memory");
 #elif (defined CHIMP_ARCH_X86_32) && (defined __GNUC__)
     /* XXX untested */
-    __asm__("movl %eax, -4(%ebp)");
-    __asm__("movl %ebx, -8(%ebp)");
-    __asm__("movl %ecx, -16(%ebp)");
-    __asm__("movl %edx, -20(%ebp)");
-    __asm__("movl %esi, -24(%ebp)");
-    __asm__("movl %edi, -28(%ebp)");
-    __asm__("movl %ebp, -32(%ebp)");
-    __asm__("movl %esp, -36(%ebp)");
+    void *regs[8];
+    __asm__ volatile ("push %eax;");
+    __asm__ volatile (
+        "movl %ebx, 4(%%eax);"
+        "movl %ecx, 8(%%eax);"
+        "movl %edx, 12(%%eax);"
+        "movl %esi, 16(%%eax);"
+        "movl %edi, 20(%%eax);"
+        "movl %ebp, 24(%%eax);"
+        "movl %esp, 28(%%eax);"
+        "pop %ebx;"
+        "movl %ebx, 32(%%eax);"
+        :
+        : "a" (regs)
+        : "%ebx", "memory");
 #else
 #warning "Unknown or unsupported architecture: GC can't grok registers"
 #endif
     
-    regs_ptr = regs;
     base = NULL;
     base = base;
 

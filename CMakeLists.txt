@@ -9,6 +9,30 @@ find_package (BISON REQUIRED)
 find_package (FLEX REQUIRED)
 find_package (Threads REQUIRED)
 
+find_path(LIBRT_INCLUDE_DIR
+    NAMES time.h
+    PATHS
+        ${LIBRTDIR}/include
+        /usr/local/include
+        /usr/include)
+
+set (LIB_SEARCH_PATH
+        ${LIBRTDIR}/lib
+        /usr/local/lib64
+        /usr/local/lib
+        /usr/lib64
+        /usr/lib
+        /usr/lib/x86_64-linux-gnu
+        /usr/lib/i386-linux-gnu)
+
+find_file(LIBRT_LIBRARIES librt.a PATHS ${LIB_SEARCH_PATH})
+
+if (NOT LIBRT_LIBRARIES)
+    find_library (LIBRT_LIBRARIES rt PATHS ${LIB_SEARCH_PATH})
+endif()
+
+message (STATUS "librt: ${LIBRT_LIBRARIES}")
+
 #
 # Find valgrind
 #
@@ -104,6 +128,10 @@ add_custom_command (
 # ---- </TEST-DRIVER> ----
 #
 
+add_custom_target (uv
+    COMMAND make
+    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/libchimp/modules/_uv/libuv)
+
 include_directories ("${CMAKE_CURRENT_BINARY_DIR}/libchimp/include" "${PROJECT_SOURCE_DIR}/libchimp/include")
 add_library (libchimp STATIC
   ${PARSER_C}
@@ -135,17 +163,31 @@ add_library (libchimp STATIC
   libchimp/modules/chimpunit.c
   libchimp/modules/gc.c
   libchimp/modules/io.c
-  libchimp/modules/os.c)
+  libchimp/modules/os.c
+  libchimp/modules/_uv/_uv.c)
 #
 # Default behaviour is to generate liblibchimp.a ...
 #
 set_target_properties (libchimp PROPERTIES OUTPUT_NAME chimp)
+set_target_properties (libchimp PROPERTIES
+    COMPILE_FLAGS "-I${PROJECT_SOURCE_DIR}/libchimp/modules/_uv/libuv/include")
+
+#set_target_properties (libchimp PROPERTIES COMPILE_FLAGS "-I${LIBRT_INCLUDE_DIR}")
+add_dependencies (libchimp uv)
+
+set (CHIMP_LIBRARIES
+    libchimp
+    ${FLEX_LIBRARIES}
+    ${BISON_LIBRARIES}
+    ${CMAKE_THREAD_LIBS_INIT}
+    ${PROJECT_BINARY_DIR}/libchimp/modules/_uv/libuv/libuv.a
+    ${LIBRT_LIBRARIES})
 
 add_executable (chimp main.c)
-target_link_libraries (chimp libchimp ${FLEX_LIBRARIES} ${BISON_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries (chimp ${CHIMP_LIBRARIES})
 
 add_executable (chasm chasm.c)
-target_link_libraries (chasm libchimp ${FLEX_LIBRARIES} ${BISON_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries (chasm ${CHIMP_LIBRARIES})
 
 #
 # TODO test for the presence of check
@@ -153,7 +195,7 @@ target_link_libraries (chasm libchimp ${FLEX_LIBRARIES} ${BISON_LIBRARIES} ${CMA
 add_executable (test-native
   EXCLUDE_FROM_ALL
   ${CMAKE_CURRENT_BINARY_DIR}/test/_test_main.c)
-target_link_libraries (test-native libchimp ${FLEX_LIBRARIES} ${BISON_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} check)
+target_link_libraries (test-native ${CHIMP_LIBRARIES} check)
 
 add_custom_target (test test-native
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/script/test
