@@ -91,6 +91,7 @@ extern int yylex(YYSTYPE *lvalp, YYLTYPE *llocp, ChimpRef *filename, ChimpRef **
 %token <ref> TOK_IDENT "identifier"
 %token <ref> TOK_STR "string literal"
 %token <ref> TOK_INT "integer literal"
+%token <ref> TOK_FLOAT "float literal"
 
 %right TOK_NOT
 %nonassoc TOK_LSQBRACKET TOK_LBRACKET TOK_FULLSTOP
@@ -117,7 +118,7 @@ extern int yylex(YYSTYPE *lvalp, YYLTYPE *llocp, ChimpRef *filename, ChimpRef **
 %type <ref> hash_elements opt_hash_elements_tail
 %type <ref> opt_pattern_hash_elements pattern_hash_elements
 %type <ref> opt_pattern_hash_elements_tail
-%type <ref> ident str array hash bool nil int
+%type <ref> ident str array hash bool nil int float
 %type <ref> ret break
 
 %%
@@ -257,6 +258,7 @@ expr4 : expr5 { $$ = $1; }
 expr5: nil { $$ = $1; }
        | str { $$ = $1; }
        | int { $$ = $1; }
+       | float { $$ = $1; }
        | ident { $$ = $1; }
        | bool { $$ = $1; }
        ;
@@ -346,6 +348,9 @@ str : TOK_STR { $$ = chimp_ast_expr_new_str ($1, &@$); }
     ;
 
 int : TOK_INT { $$ = chimp_ast_expr_new_int_ ($1, &@$); }
+    ;
+
+float : TOK_FLOAT { $$ = chimp_ast_expr_new_float_ ($1, &@$); }
     ;
 
 nil : TOK_NIL { $$ = chimp_ast_expr_new_nil (&@$); }

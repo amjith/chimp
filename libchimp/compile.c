@@ -191,6 +191,9 @@ static chimp_bool_t
 chimp_compile_ast_expr_int_ (ChimpCodeCompiler *c, ChimpRef *expr);
 
 static chimp_bool_t
+chimp_compile_ast_expr_float_ (ChimpCodeCompiler *c, ChimpRef *expr);
+
+static chimp_bool_t
 chimp_compile_ast_expr_bool (ChimpCodeCompiler *c, ChimpRef *expr);
 
 static chimp_bool_t
@@ -685,6 +688,11 @@ chimp_compile_ast_stmt_hash_pattern_test (
                     realkey = CHIMP_AST_EXPR(key)->int_.value;
                     break;
                 }
+            case CHIMP_AST_EXPR_FLOAT_:
+                {
+                    realkey = CHIMP_AST_EXPR(key)->float_.value;
+                    break;
+                }
             case CHIMP_AST_EXPR_BOOL:
                 {
                     realkey = CHIMP_AST_EXPR(key)->bool.value;
@@ -811,6 +819,16 @@ chimp_compile_ast_stmt_pattern_test (
                 }
 
                 break;
+            }
+        case CHIMP_AST_EXPR_FLOAT_:
+            {
+                ChimpRef *value = CHIMP_AST_EXPR(test)->float_.value;
+                if (!chimp_compile_ast_stmt_simple_pattern_test(
+                        c, "float", value, next_label )) {
+                    return CHIMP_FALSE;
+                }
+
+               break; 
             }
         case CHIMP_AST_EXPR_STR:
             {
@@ -1407,6 +1425,8 @@ chimp_compile_ast_expr (ChimpCodeCompiler *c, ChimpRef *expr)
             return chimp_compile_ast_expr_binop (c, expr);
         case CHIMP_AST_EXPR_INT_:
             return chimp_compile_ast_expr_int_ (c, expr);
+        case CHIMP_AST_EXPR_FLOAT_:
+            return chimp_compile_ast_expr_float_ (c, expr);
         case CHIMP_AST_EXPR_FN:
             return chimp_compile_ast_expr_fn (c, expr);
         case CHIMP_AST_EXPR_SPAWN:
@@ -1589,6 +1609,16 @@ chimp_compile_ast_expr_int_ (ChimpCodeCompiler *c, ChimpRef *expr)
 {
     ChimpRef *code = CHIMP_COMPILER_CODE(c);
     if (chimp_code_pushconst (code, CHIMP_AST_EXPR(expr)->int_.value) < 0) {
+        return CHIMP_FALSE;
+    }
+    return CHIMP_TRUE;
+}
+
+static chimp_bool_t
+chimp_compile_ast_expr_float_ (ChimpCodeCompiler *c, ChimpRef *expr)
+{
+    ChimpRef *code = CHIMP_COMPILER_CODE(c);
+    if (chimp_code_pushconst (code, CHIMP_AST_EXPR(expr)->float_.value) < 0) {
         return CHIMP_FALSE;
     }
     return CHIMP_TRUE;

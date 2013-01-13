@@ -10,6 +10,7 @@ HEADER_FILE, SOURCE_FILE = sys.argv[1:3]
 CORE_TYPES = {
     'str':   {'ctype': 'ChimpRef*'},
     'int':   {'ctype': 'ChimpRef*'},
+    'float': {'ctype': 'ChimpRef*'},
     'array': {'ctype': 'ChimpRef*'},
     'hash':  {'ctype': 'ChimpRef*'},
     'bool':  {'ctype': 'ChimpRef*'},
@@ -46,6 +47,8 @@ AST_DESCRIPTOR = [
             ['value', 'str']],
         ['int',
             ['value', 'int']],
+        ['float',
+            ['value', 'float']],
         ['ident',
             ['id', 'str']],
         ['wildcard'],
@@ -136,7 +139,7 @@ def node_type_params(t):
 
 def kind_params(k):
     name = k[0]
-    if name in ('if', 'int', 'while', 'break'):
+    if name in ('if', 'int', 'float', 'while', 'break'):
         name += "_";
     return {
         "kind": name,
