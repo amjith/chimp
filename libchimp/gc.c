@@ -417,8 +417,10 @@ chimp_gc_collect (ChimpGC *gc)
          "movq %%r13, 88(%%rax);"
          "movq %%r14, 96(%%rax);"
          "movq %%r15, 104(%%rax);"
+         "movq %%rbp, 112(%%rax);"
+         "movq %%rsp, 120(%%rax);"
          "pop %%rbx;"
-         "movq %%rbx, 112(%%rax);"
+         "movq %%rbx, 128(%%rax);"
          :
          : "a" (regs)
          : "%rbx", "memory");
@@ -427,15 +429,15 @@ chimp_gc_collect (ChimpGC *gc)
     void *regs[8];
     __asm__ volatile ("push %eax;");
     __asm__ volatile (
-        "movl %ebx, 4(%%eax);"
-        "movl %ecx, 8(%%eax);"
-        "movl %edx, 12(%%eax);"
-        "movl %esi, 16(%%eax);"
-        "movl %edi, 20(%%eax);"
-        "movl %ebp, 24(%%eax);"
-        "movl %esp, 28(%%eax);"
-        "pop %ebx;"
-        "movl %ebx, 32(%%eax);"
+        "movl %%ebx, 4(%%eax);"
+        "movl %%ecx, 8(%%eax);"
+        "movl %%edx, 12(%%eax);"
+        "movl %%esi, 16(%%eax);"
+        "movl %%edi, 20(%%eax);"
+        "movl %%ebp, 24(%%eax);"
+        "movl %%esp, 28(%%eax);"
+        "pop %%ebx;"
+        "movl %%ebx, 32(%%eax);"
         :
         : "a" (regs)
         : "%ebx", "memory");

@@ -145,7 +145,7 @@ chimp_class_new (ChimpRef *name, ChimpRef *super, size_t size)
     
     if (size > CHIMP_VALUE_SIZE) {
         CHIMP_BUG ("objects cannot be more than %zu bytes (%s is too big)",
-            size, CHIMP_STR_DATA(name));
+            CHIMP_VALUE_SIZE, CHIMP_STR_DATA(name));
         return NULL;
     }
 

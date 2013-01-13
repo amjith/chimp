@@ -29,6 +29,14 @@ endif()
 
 message (STATUS "librt: ${LIBRT_LIBRARIES}")
 
+if (APPLE)
+  find_library (COREFOUNDATION_LIBRARY CoreFoundation)
+  message (STATUS "CoreFoundation: ${COREFOUNDATION_LIBRARY}")
+
+  find_library (CORESERVICES_LIBRARY CoreServices)
+  message (STATUS "CoreServices: ${CORESERVICES_LIBRARY}")
+endif()
+
 #
 # Find valgrind
 #
@@ -124,9 +132,13 @@ add_custom_command (
 # ---- </TEST-DRIVER> ----
 #
 
-add_custom_target (uv
-    COMMAND make
-    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/libchimp/modules/_uv/libuv)
+add_custom_target (uv make
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/libchimp/modules/_uv/libuv"
+    VERBATIM)
+
+add_custom_target (uv-clean make clean
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/libchimp/modules/_uv/libuv"
+    VERBATIM)
 
 include_directories ("${CMAKE_CURRENT_BINARY_DIR}/libchimp/include" "${PROJECT_SOURCE_DIR}/libchimp/include")
 add_library (libchimp STATIC
@@ -177,6 +189,8 @@ set (CHIMP_LIBRARIES
     ${BISON_LIBRARIES}
     ${CMAKE_THREAD_LIBS_INIT}
     ${PROJECT_BINARY_DIR}/libchimp/modules/_uv/libuv/libuv.a
+    ${COREFOUNDATION_LIBRARY}
+    ${CORESERVICES_LIBRARY}
     ${LIBRT_LIBRARIES})
 
 add_executable (chimp main.c)
@@ -196,3 +210,4 @@ target_link_libraries (test-native ${CHIMP_LIBRARIES} check)
 add_custom_target (test test-native
   COMMAND ${CMAKE_CURRENT_BINARY_DIR}/script/test
   DEPENDS test-native)
+

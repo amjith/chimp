@@ -11,6 +11,7 @@ config.status
 config.site
 /chimp
 Makefile
+!/libchimp/modules/_uv/libuv/Makefile
 autom4te.cache
 /libtool
 /libchimp/ast.c
